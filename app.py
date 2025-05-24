@@ -25,7 +25,7 @@ def get_db_connection():
         port=3306              # Port par défaut MySQL
     )
 
-@babel.localeselector
+@babel.localeselector_function
 def get_locale():
     print("Session content:", dict(session))
     if 'lang' in session:
