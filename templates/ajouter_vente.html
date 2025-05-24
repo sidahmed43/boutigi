@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4" dir="rtl">
+    <div class="row mb-4">
+        <div class="col">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="display-5 fw-bold text-primary">{{ _("بيع جديد") }}</h1>
+            </div>
+            <hr class="my-4">
+        </div>
+    </div>
+    
+    {% include '_messages.html' %}
+    
+    <form method="POST" id="venteForm">
+        <div class="row mb-4">
+            <!-- Sélection du client -->
+            <div class="col-md-4">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-light py-3">
+                        <h5 class="card-title mb-0 fw-bold">{{ _("معلومات العميل") }}</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label class="form-label fw-bold mb-2">{{ _("العميل") }}</label>
+                            <select name="client_id" class="form-select">
+                                <option value="">{{ _("اختر عميلاً") }}</option>
+                                {% for client in clients %}
+                                    <option value="{{ client.id }}">{{ client.nom }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Produits -->
+        <div class="card shadow-sm border-0 mt-3">
+            <div class="card-header bg-light py-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0 fw-bold">{{ _("المنتجات المباعة") }}</h5>
+                    <button type="button" class="btn btn-success" id="ajouterProduit">
+                        <i class="fas fa-plus-circle me-2"></i>{{ _("إضافة منتج") }}
+                    </button>
+                </div>
+            </div>
+            
+            <div class="card-body" id="produitsContainer">
+                <!-- Template de ligne de produit -->
+                <template id="produitTemplate">
+                    <div class="row mb-3 produit-row align-items-center p-2 border-bottom pb-3">
+                        <div class="col-md-5">
+                            <label class="form-label small text-muted mb-1">{{ _("المنتج") }}</label>
+                            <select name="produit_id[]" class="form-select produit-select">
+                                <option value="">{{ _("اختر منتجاً") }}</option>
+                                {% for produit in produits %}
+                                    <option value="{{ produit.id }}" data-prix="{{ produit.prix }}">
+                                        {{ produit.nom }} ({{ produit.prix }} DH)
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label small text-muted mb-1">{{ _("الكمية") }}</label>
+                            <input type="number" name="quantite[]" class="form-control quantite" min="1" value="1">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small text-muted mb-1">{{ _("سعر الوحدة") }}</label>
+                            <div class="input-group">
+                                <input type="number" name="prix_unitaire[]" class="form-control prix" step="0.01" readonly>
+                                <span class="input-group-text">DH</span>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label small text-muted mb-1">{{ _("إزالة") }}</label>
+                            <button type="button" class="btn btn-outline-danger w-100 supprimer-ligne">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                </template>
+            </div>
+            
+            <div class="card-footer bg-light">
+                <div class="row">
+                    <div class="col-md-6">
+                        <span class="text-muted">{{ _("عدد المنتجات") }}: <span id="nombreProduits">0</span></span>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <h4 class="mb-0">{{ _("المجموع") }}: <span id="totalVente" class="text-success fw-bold">0.00</span> <small>DH</small></h4>
+                        <input type="hidden" name="total" id="totalInput">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-4 text-start">
+            <button type="submit" class="btn btn-primary btn-lg">
+                <i class="fas fa-save me-2"></i>{{ _("حفظ") }}
+            </button>
+            <a href="{{ url_for('ventes') }}" class="btn btn-outline-secondary btn-lg ms-2">
+                <i class="fas fa-times me-2"></i>{{ _("إلغاء") }}
+            </a>
+        </div>
+    </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const container = document.getElementById('produitsContainer');
+    const template = document.getElementById('produitTemplate');
+    let total = 0;
+
+    // Ajouter une ligne de produit
+    document.getElementById('ajouterProduit').addEventListener('click', function() {
+        const clone = template.content.cloneNode(true);
+        container.appendChild(clone);
+        attachEventListeners(container.lastElementChild);
+        updateCount();
+    });
+
+    // Calcul du total
+    function updateTotal() {
+        total = 0;
+        document.querySelectorAll('.produit-row').forEach(row => {
+            const quantite = parseFloat(row.querySelector('.quantite').value) || 0;
+            const prix = parseFloat(row.querySelector('.prix').value) || 0;
+            total += quantite * prix;
+        });
+        document.getElementById('totalVente').textContent = total.toFixed(2);
+        document.getElementById('totalInput').value = total.toFixed(2);
+    }
+    
+    // Mise à jour du compteur de produits
+    function updateCount() {
+        const count = document.querySelectorAll('.produit-row').length;
+        document.getElementById('nombreProduits').textContent = count;
+    }
+
+    // Gestion des événements
+    function attachEventListeners(row) {
+        row.querySelector('.produit-select').addEventListener('change', function() {
+            const prix = this.options[this.selectedIndex]?.dataset.prix || 0;
+            row.querySelector('.prix').value = prix;
+            updateTotal();
+        });
+
+        row.querySelector('.quantite').addEventListener('input', updateTotal);
+        
+        row.querySelector('.supprimer-ligne').addEventListener('click', function() {
+            row.remove();
+            updateTotal();
+            updateCount();
+        });
+    }
+
+    // Initialiser une ligne vide
+    document.getElementById('ajouterProduit').click();
+});
+</script>
+
+<style>
+    @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css');
+    
+    .produit-row {
+        transition: all 0.3s ease;
+        border-radius: 0.25rem;
+    }
+    
+    .produit-row:hover {
+        background-color: rgba(0, 0, 0, 0.02);
+    }
+    
+    .supprimer-ligne { 
+        cursor: pointer; 
+    }
+    
+    .form-select, .form-control {
+        padding: 0.5rem;
+    }
+    
+    .card {
+        overflow: hidden;
+    }
+</style>
+{% endblock %}

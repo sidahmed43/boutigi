@@ -1,0 +1,46 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Stocks 1.0\n"
+"Report-Msgid-Bugs-To: contact@example.com\n"
+"POT-Creation-Date: 2025-05-05 06:39+0000\n"
+"PO-Revision-Date: 2025-05-05 10:00+0000\n"
+"Last-Translator: John Doe <john@example.com>\n"
+"Language: en\n"
+"Language-Team: English <en@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.12.1\n"
+
+#: templates/base.html:5
+msgid "تطبيق التاجر"
+msgstr "Merchant App"
+
+#: templates/base.html:10
+msgid "الرئيسية"
+msgstr "Home"
+
+#: templates/base.html:11
+msgid "المنتجات"
+msgstr "Products"
+
+#: templates/base.html:12
+msgid "العملاء"
+msgstr "Clients"
+
+#: templates/base.html:13
+msgid "المبيعات"
+msgstr "Sales"
+
+#: templates/base.html:14
+msgid "الإحصائيات"
+msgstr "Statistics"
+
+#: templates/base.html:19
+msgid "ع.م"
+msgstr "AM"
+
+#: templates/dashboard.html:7
+msgid "مرحبا بك في تطبيق التاجر"
+msgstr "Welcome to Merchant Application"

@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4" dir="rtl">
+    <div class="row mb-4">
+        <div class="col">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="display-5 fw-bold text-primary">{{ _("إضافة منتج جديد") }}</h1>
+            </div>
+            <hr class="my-4">
+        </div>
+    </div>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} shadow-sm border-0">
+                    {% if category == 'success' %}
+                        <i class="fas fa-check-circle me-2"></i>
+                    {% elif category in ['danger','error'] %}
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                    {% elif category == 'warning' %}
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                    {% elif category == 'info' %}
+                        <i class="fas fa-info-circle me-2"></i>
+                    {% endif %}
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-light py-3">
+                    <h5 class="card-title mb-0 fw-bold">{{ _("معلومات المنتج") }}</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST" action="{{ url_for('ajouter_produit') }}">
+                        <!-- Champ Nom du Produit -->
+                        <div class="form-group mb-3">
+                            <label for="nom" class="form-label fw-bold">{{ _("اسم المنتج") }}:</label>
+                            <input type="text" id="nom" name="nom" required class="form-control" placeholder="{{ _('أدخل اسم المنتج') }}">
+                        </div>
+
+                        <!-- Prix d'achat et Prix de vente -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="prix_achat" class="form-label fw-bold">{{ _("سعر الشراء") }}:</label>
+                                <div class="input-group">
+                                    <input type="number" step="0.01" id="prix_achat" name="prix_achat" 
+                                           required class="form-control" placeholder="0.00">
+                                    <span class="input-group-text">DH</span>
+                                </div>
+                                <small class="text-muted">{{ _("السعر الذي اشتريت به المنتج") }}</small>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="prix" class="form-label fw-bold">{{ _("سعر البيع") }}:</label>
+                                <div class="input-group">
+                                    <input type="number" step="0.01" id="prix" name="prix" 
+                                           required class="form-control" placeholder="0.00">
+                                    <span class="input-group-text">DH</span>
+                                </div>
+                                <small class="text-muted">{{ _("السعر الذي ستبيع به المنتج") }}</small>
+                            </div>
+                        </div>
+
+                        <!-- Quantité et Catégorie -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="quantite" class="form-label fw-bold">{{ _("الكمية المتوفرة") }}:</label>
+                                    <input type="number" id="quantite" name="quantite" 
+                                           required class="form-control" placeholder="0">
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="categorie_id" class="form-label fw-bold">{{ _("الفئة") }}:</label>
+                                    <select id="categorie_id" name="categorie_id" class="form-select">
+                                        <option value="">{{ _("اختر فئة") }}</option>
+                                        {% for categorie in categories %}
+                                            <option value="{{ categorie.id }}">{{ categorie.nom }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Boutons de soumission -->
+                        <div class="mt-4 text-start">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-plus-circle me-2"></i>{{ _("إضافة المنتج") }}
+                            </button>
+                            <a href="{{ url_for('produits') }}" class="btn btn-outline-secondary ms-2">
+                                <i class="fas fa-times me-2"></i>{{ _("إلغاء") }}
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

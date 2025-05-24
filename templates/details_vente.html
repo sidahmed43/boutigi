@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4" dir="rtl">
+    <div class="row mb-4">
+        <div class="col">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="display-5 fw-bold text-primary">{{ _("تفاصيل البيع") }} #{{ vente.id }}</h1>
+                <a href="{{ url_for('print_vente', id=vente.id) }}" class="btn btn-outline-primary" target="_blank">
+                    <i class="fas fa-print me-2"></i> {{ _("طباعة") }}
+                </a>
+            </div>
+            <hr class="my-4">
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-lg-4 mb-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-light py-3">
+                    <h5 class="card-title mb-0 fw-bold">{{ _("معلومات عامة") }}</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item border-0 d-flex justify-content-between">
+                            <span class="fw-bold text-muted">{{ _("التاريخ") }}:</span>
+                            <span>{{ vente.date.strftime('%d/%m/%Y %H:%M') }}</span>
+                        </li>
+                        <li class="list-group-item border-0 d-flex justify-content-between">
+                            <span class="fw-bold text-muted">{{ _("العميل") }}:</span>
+                            <span>{{ vente.client_nom or _("مجهول") }}</span>
+                        </li>
+                        <li class="list-group-item border-0 d-flex justify-content-between">
+                            <span class="fw-bold text-muted">{{ _("المجموع") }}:</span>
+                            <span class="fw-bold text-success">{{ "%.2f"|format(vente.total) }} <small>DH</small></span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-8 mb-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-light py-3">
+                    <h5 class="card-title mb-0 fw-bold">{{ _("المنتجات المباعة") }}</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="fw-bold">{{ _("المنتج") }}</th>
+                                    <th class="fw-bold">{{ _("الكمية") }}</th>
+                                    <th class="fw-bold">{{ _("سعر الوحدة") }}</th>
+                                    <th class="fw-bold">{{ _("المجموع الفرعي") }}</th>
+                                    <th class="fw-bold">{{ _("المخزون الحالي") }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for detail in details %}
+                                <tr>
+                                    <td><strong>{{ detail.produit_nom }}</strong></td>
+                                    <td>{{ detail.quantite }}</td>
+                                    <td>{{ "%.2f"|format(detail.prix_unitaire) }} <small>DH</small></td>
+                                    <td class="fw-bold">{{ "%.2f"|format(detail.quantite * detail.prix_unitaire) }} <small>DH</small></td>
+                                    <td>
+                                        <span class="badge bg-{{ 'danger' if detail.stock_actuel < 10 else 'success' }} rounded-pill px-3 py-2">
+                                            {{ detail.stock_actuel }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="text-start mt-2">
+        <a href="{{ url_for('ventes') }}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-right me-2"></i> {{ _("العودة إلى المبيعات") }}
+        </a>
+    </div>
+</div>
+
+<!-- Ajout du lien Font Awesome pour les icônes -->
+<style>
+    @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css');
+    
+    .table th, .table td {
+        padding: 0.75rem;
+    }
+    
+    .btn-outline-info:hover, 
+    .btn-outline-primary:hover,
+    .btn-outline-danger:hover,
+    .btn-outline-secondary:hover {
+        color: white;
+    }
+    
+    .list-group-item {
+        padding: 0.75rem 0;
+    }
+</style>
+{% endblock %}

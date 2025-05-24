@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1>{{ _("Éditer Catégorie") }}</h1>
+    
+<form method="POST">
+    <div class="form-group">
+        <label>Nom *</label>
+        <input type="text" name="nom" 
+               class="form-control" 
+               value="{{ categorie.nom }}" required>
+    </div>
+    
+    <button type="submit" class="btn btn-primary">Mettre à jour</button>
+</form>
+</div>
+{% endblock %}

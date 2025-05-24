@@ -1,0 +1,227 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container-fluid py-4">
+  <div class="row">
+    <!-- Filtres -->
+    <div class="col-md-3 mb-4">
+      <div class="card shadow-sm">
+        <div class="card-header bg-white">
+          <h5 class="fw-bold mb-0"><i class="fas fa-filter me-2"></i>{{ _("Filtres") }}</h5>
+        </div>
+        <div class="card-body">
+          <form id="statsFilter">
+            <div class="mb-3">
+              <label class="form-label small">{{ _("Période") }}</label>
+              <select class="form-select" name="periode">
+                <option value="30">{{ _("30 derniers jours") }}</option>
+                <option value="90">{{ _("3 derniers mois") }}</option>
+                <option value="365">{{ _("1 an") }}</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">
+              <i class="fas fa-sync me-2"></i>{{ _("Actualiser") }}
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contenu principal -->
+    <div class="col-md-9">
+      <!-- KPI -->
+      <div class="row mb-4">
+        <div class="col-6 col-lg-3 mb-3">
+          <div class="card kpi-card bg-primary text-white">
+            <div class="card-body">
+              <h5 class="card-title">{{ _("CA Total") }}</h5>
+              <h2 class="mb-0">{{ "%.2f DH"|format(stats_generales.chiffre_affaire_total|default(0)) }}</h2>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-lg-3 mb-3">
+          <div class="card kpi-card bg-success text-white">
+            <div class="card-body">
+              <h5 class="card-title">{{ _("Panier Moyen") }}</h5>
+              <h2 class="mb-0">{{ "%.2f DH"|format(stats_generales.panier_moyen|default(0)) }}</h2>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-lg-3 mb-3">
+          <div class="card kpi-card bg-info text-white">
+            <div class="card-body">
+              <h5 class="card-title">{{ _("Clients") }}</h5>
+              <h2 class="mb-0">{{ stats_generales.total_clients|default(0) }}</h2>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-lg-3 mb-3">
+          <div class="card kpi-card bg-warning text-white">
+            <div class="card-body">
+              <h5 class="card-title">{{ _("Transactions") }}</h5>
+              <h2 class="mb-0">{{ stats_generales.total_ventes|default(0) }}</h2>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Graphique principal -->
+      <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+          <h5 class="fw-bold mb-0"><i class="fas fa-chart-line me-2"></i>{{ _("Évolution du CA") }}</h5>
+          <div class="btn-group">
+            <button type="button" class="btn btn-sm btn-outline-secondary active" data-chart-type="line">
+              <i class="fas fa-chart-line"></i>
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" data-chart-type="bar">
+              <i class="fas fa-chart-bar"></i>
+            </button>
+          </div>
+        </div>
+        <div class="card-body">
+          <canvas id="caChart" height="200"></canvas>
+        </div>
+      </div>
+
+      <!-- Tableaux de données -->
+      <div class="row">
+        <div class="col-lg-6 mb-4">
+          <div class="card shadow-sm">
+            <div class="card-header bg-white">
+              <h5 class="fw-bold mb-0"><i class="fas fa-cube me-2"></i>{{ _("Top Produits") }}</h5>
+            </div>
+            <div class="table-responsive">
+              <table class="table table-hover mb-0">
+                <thead>
+                  <tr>
+                    <th>{{ _("Produit") }}</th>
+                    <th class="text-end">{{ _("Quantité") }}</th>
+                    <th class="text-end">{{ _("CA Généré") }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for produit in top_produits %}
+                  <tr>
+                    <td>{{ produit.nom }}</td>
+                    <td class="text-end">{{ produit.total_vendu }}</td>
+                    <td class="text-end">{{ "%.2f DH"|format(produit.chiffre_affaire) }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-6 mb-4">
+          <div class="card shadow-sm">
+            <div class="card-header bg-white">
+              <h5 class="fw-bold mb-0"><i class="fas fa-users me-2"></i>{{ _("Top Clients") }}</h5>
+            </div>
+            <div class="table-responsive">
+              <table class="table table-hover mb-0">
+                <thead>
+                  <tr>
+                    <th>{{ _("Client") }}</th>
+                    <th class="text-end">{{ _("Achats") }}</th>
+                    <th class="text-end">{{ _("Dépense Totale") }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for client in activite_clients %}
+                  <tr>
+                    <td>{{ client.nom }}</td>
+                    <td class="text-end">{{ client.nombre_achats }}</td>
+                    <td class="text-end">{{ "%.2f DH"|format(client.total_depense) }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Scripts Graphiques -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('caChart').getContext('2d');
+    const chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: {{ mois|tojson }},
+            datasets: [{
+                label: '{{ _("Chiffre d'affaires") }}',
+                data: {{ ca_mensuel|tojson }},
+                borderColor: '#0d6efd',
+                backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                tension: 0.3,
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                tooltip: {
+                    mode: 'index',
+                    intersect: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return value + ' DH';
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Gestion du changement de type de graphique
+    document.querySelectorAll('[data-chart-type]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            chart.config.type = btn.dataset.chartType;
+            chart.update();
+            document.querySelectorAll('[data-chart-type]').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        });
+    });
+
+    // Gestion des filtres
+    document.getElementById('statsFilter').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        fetch('/statistiques?periode=' + formData.get('periode'))
+            .then(response => response.text())
+            .then(html => {
+                document.documentElement.innerHTML = html;
+            });
+    });
+});
+</script>
+
+<style>
+.kpi-card {
+    transition: transform 0.2s;
+    border: none;
+}
+
+.kpi-card:hover {
+    transform: translateY(-3px);
+}
+
+.table-hover tbody tr {
+    transition: background-color 0.15s;
+}
+
+.card-header {
+    background-color: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(5px);
+}
+</style>
+{% endblock %}

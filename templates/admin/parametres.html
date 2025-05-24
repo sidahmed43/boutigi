@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Paramètres du Supermarché</h2>
+    
+   <form method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label>Logo</label>
+            {% if infos.logo %}
+            <div class="mb-2">
+                <img src="{{ url_for('static', filename='logos/' + infos.logo) }}" 
+                     style="max-height: 100px" class="img-thumbnail">
+            </div>
+            {% endif %}
+            <div class="custom-file">
+                <input type="file" name="logo" class="custom-file-input" 
+                       id="customFile" accept="image/*">
+                <label class="custom-file-label" for="customFile">
+                    Choisir un fichier...
+                </label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Nom du Supermarché</label>
+            <input type="text" name="nom" class="form-control" 
+                   value="{{ infos.nom|default('') }}" required>
+        </div>
+
+        <div class="form-group">
+            <label>Téléphone</label>
+            <input type="tel" name="telephone" class="form-control"
+                   value="{{ infos.telephone|default('') }}" required>
+        </div>
+
+        <div class="form-group">
+            <label>Adresse</label>
+            <textarea name="adresse" class="form-control" rows="3" 
+                      required>{{ infos.adresse|default('') }}</textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Enregistrer</button>
+    </form>
+</div>
+<script>
+document.querySelector('.custom-file-input').addEventListener('change', function(e) {
+    let fileName = document.getElementById("customFile").files[0].name;
+    let nextSibling = e.target.nextElementSibling;
+    nextSibling.innerText = fileName;
+});
+</script>
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1>{{ _("Gestion des Catégories") }}</h1>
+    <a href="{{ url_for('ajouter_categorie') }}" class="btn btn-primary mb-3">
+        {{ _("Nouvelle Catégorie") }}
+    </a>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>{{ _("Nom") }}</th>
+                <th>{{ _("Description") }}</th>
+                <th>{{ _("Actions") }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for categorie in categories %}
+            <tr>
+                <td>{{ categorie.nom }}</td>
+                <td>{{ categorie.description|default('', true) }}</td>
+                <td>
+                    <a href="{{ url_for('editer_categorie', id=categorie.id) }}" 
+                       class="btn btn-sm btn-warning">
+                        {{ _("Éditer") }}
+                    </a>
+                    <form method="POST" 
+                          action="{{ url_for('supprimer_categorie', id=categorie.id) }}" 
+                          style="display: inline;">
+                        <button type="submit" 
+                                class="btn btn-sm btn-danger"
+                                onclick="return confirm('{{ _('Êtes-vous sûr ?') }}')">
+                            {{ _("Supprimer") }}
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="3">{{ _("Aucune catégorie trouvée") }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

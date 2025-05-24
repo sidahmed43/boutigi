@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1>{{ _("Nouvelle Catégorie") }}</h1>
+    
+<form method="POST">
+    <div class="form-group">
+        <label>Nom de la catégorie *</label>
+        <input type="text" name="nom" class="form-control" required>
+    </div>
+    
+    <button type="submit" class="btn btn-primary">Enregistrer</button>
+</form>
+</div>
+{% endblock %}

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Facture #{{ vente.id }}</title>
+    <style>
+        /* Style général */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        /* Cache les éléments pendant l'impression */
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            
+            body {
+                margin: 0;
+                font-size: 12pt;
+            }
+        }
+
+        /* Style du tableau */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f5f5f5;
+        }
+
+        .total {
+            font-weight: bold;
+            margin-top: 30px;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+    <!-- Bouton d'impression -->
+    <button onclick="window.print()" class="no-print">
+        🖨️ Imprimer
+    </button>
+
+    <a href="{{ url_for('ventes') }}" class="no-print">
+        ← Retour
+    </a>
+
+    <!-- Contenu de la facture -->
+    <h1>Facture N°{{ vente.id }}</h1>
+    <!-- Ajouter en haut du body -->
+    <div class="header-entreprise">
+        <div style="text-align: center; margin-bottom: 30px;">
+            {% if supermarket.logo %}
+            <img src="{{ url_for('static', filename='logos/' + supermarket.logo) }}" 
+                style="max-height: 80px; margin-bottom: 15px;">
+            {% endif %}
+            <h2>{{ supermarket.nom }}</h2>
+            <p>{{ supermarket.telephone }}</p>
+            <p>{{ supermarket.adresse }}</p>
+        </div>
+    </div>
+    
+    <div class="infos-vente">
+        <p>Date : {{ vente.date|datetimeformat }}</p>
+        {% if vente.client_nom %}
+        <p>Client : {{ vente.client_nom }}</p>
+        {% endif %}
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Produit</th>
+                <th>Quantité</th>
+                <th>Prix unitaire</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in details %}
+            <tr>
+                <td>{{ item.produit_nom }}</td>
+                <td>{{ item.quantite }}</td>
+                <td>{{ "%.2f"|format(item.prix_unitaire) }} DH</td>
+                <td>{{ "%.2f"|format(item.quantite * item.prix_unitaire) }} DH</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="total">
+        Total général : {{ "%.2f"|format(vente.total) }} DH
+    </div>
+
+    <div class="footer">
+        <p>Imprimé le : {{ maintenant.strftime('%d/%m/%Y à %H:%M') }}</p>
+    </div>
+
+    <script>
+        // Optionnel : Auto-impression au chargement
+        window.onload = function() {
+            window.print();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4" dir="rtl">
+    <div class="row mb-4">
+        <div class="col">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="display-5 fw-bold text-primary">{{ _("إدارة المبيعات") }}</h1>
+                <a href="{{ url_for('ajouter_vente') }}" class="btn btn-primary btn-lg shadow-sm">
+                    <i class="fas fa-plus-circle me-2"></i> {{ _("بيع جديد") }}
+                </a>
+            </div>
+            <hr class="my-4">
+        </div>
+    </div>
+    
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle" dir="rtl">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="fw-bold">{{ _("التاريخ") }}</th>
+                            <th class="fw-bold">{{ _("العميل") }}</th>
+                            <th class="fw-bold">{{ _("المجموع") }}</th>
+                            <th class="fw-bold text-center">{{ _("الإجراءات") }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for vente in ventes %}
+                            <tr>
+                                <td><span class="text-muted">{{ vente.date.strftime('%d/%m/%Y') }}</span> <small>{{ vente.date.strftime('%H:%M') }}</small></td>
+                                <td>
+                                    {% if vente.client_nom %}
+                                        <strong>{{ vente.client_nom }}</strong>
+                                    {% else %}
+                                        <span class="text-secondary">{{ _("مجهول") }}</span>
+                                    {% endif %}
+                                </td>
+                                <td><span class="fw-bold text-success">{{ "%.2f"|format(vente.total) }} <small>DH</small></span></td>
+                                <td>
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <a href="{{ url_for('details_vente', id=vente.id) }}" class="btn btn-sm btn-outline-info">
+                                            <i class="fas fa-info-circle"></i> {{ _("التفاصيل") }}
+                                        </a>
+                                        <a href="{{ url_for('print_vente', id=vente.id) }}" 
+                                        class="btn btn-sm btn-outline-primary"
+                                        target="_blank">
+                                            <i class="fas fa-print"></i> {{ _("طباعة") }}
+                                        </a>
+                                    
+                                        <form method="POST" action="{{ url_for('supprimer_vente', id=vente.id) }}" style="display:inline">
+                                            <button type="submit" 
+                                                    class="btn btn-sm btn-outline-danger"
+                                                    onclick="return confirm({{ _('هل تريد حذف هذا البيع؟')|tojson }});">
+                                                <i class="fas fa-trash-alt"></i> {{ _("حذف") }}
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="4" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="fas fa-search fa-3x mb-3"></i>
+                                        <p>{{ _("لم يتم العثور على أي مبيعات") }}</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Ajout du lien Font Awesome pour les icônes -->
+<style>
+    @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css');
+    
+    .table th, .table td {
+        padding: 1rem;
+    }
+    
+    .btn-outline-info:hover, 
+    .btn-outline-primary:hover,
+    .btn-outline-danger:hover {
+        color: white;
+    }
+</style>
+{% endblock %}

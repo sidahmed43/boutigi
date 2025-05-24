@@ -1,0 +1,329 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container-fluid py-4">
+  <div class="row">
+    <!-- Sidebar amélioré -->
+    <div class="col-lg-2 d-none d-lg-block">
+      <div class="position-sticky top-4">
+        <div class="bg-white shadow-lg rounded-3 p-3 mb-4 sidebar-card">
+          <!-- Profil utilisateur -->
+          <div class="text-center mb-4">
+            <div class="avatar-container mb-3 position-relative">
+              <img src="/static/img/avatar.png" class="rounded-circle border shadow-sm" width="90" height="90" alt="Avatar">
+              <span class="position-absolute bottom-0 end-0 bg-success rounded-circle p-1 border-2 border-white"></span>
+            </div>
+            <h6 class="fw-bold mb-1 text-primary">{{ _("مرحبا") }}</h6>
+            <p class="text-muted small mb-0">{{ _("مدير النظام") }}</p>
+          </div>
+          
+          <!-- Navigation verticale -->
+          <nav class="nav flex-column">
+            <a href="{{ url_for('dashboard') }}" class="nav-link active d-flex align-items-center py-3">
+              <i class="fas fa-tachometer-alt fa-fw me-3"></i>
+              <span>{{ _("لوحة التحكم") }}</span>
+            </a>
+            <a href="{{ url_for('produits') }}" class="nav-link d-flex align-items-center py-3">
+              <i class="fas fa-box-open fa-fw me-3"></i>
+              <span>{{ _("المنتجات") }}</span>
+              <span class="badge bg-primary ms-auto">{{ total_produits }}</span>
+            </a>
+            <a href="{{ url_for('clients') }}" class="nav-link d-flex align-items-center py-3">
+              <i class="fas fa-users fa-fw me-3"></i>
+              <span>{{ _("العملاء") }}</span>
+              <span class="badge bg-success ms-auto">{{ total_clients }}</span>
+            </a>
+            <a href="{{ url_for('ventes') }}" class="nav-link d-flex align-items-center py-3">
+              <i class="fas fa-chart-line fa-fw me-3"></i>
+              <span>{{ _("المبيعات") }}</span>
+            </a>
+            <div class="dropdown-divider my-2"></div>
+            <a href="{{ url_for('settings') }}" class="nav-link d-flex align-items-center py-3">
+              <i class="fas fa-cog fa-fw me-3"></i>
+              <span>{{ _("الإعدادات") }}</span>
+            </a>
+          </nav>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contenu principal réorganisé -->
+    <div class="col-lg-10">
+      <!-- En-tête amélioré -->
+      <header class="dashboard-header bg-white shadow-lg rounded-3 p-4 mb-4">
+        <div class="d-flex flex-wrap justify-content-between align-items-center">
+          <div class="mb-3 mb-md-0">
+            <h1 class="h3 fw-bold text-primary mb-2">
+              <i class="fas fa-tachometer-alt me-2"></i>{{ _("لوحة التحكم") }}
+            </h1>
+            <p class="text-muted mb-0 small">
+              <i class="fas fa-info-circle me-2"></i>{{ _("آخر تحديث: ") }}{{ current_date|datetimeformat('%d %B %Y %H:%M') }}
+            </p>
+          </div>
+          
+          <!-- Actions rapides -->
+          <div class="d-flex align-items-center gap-3">
+            <div class="date-picker-input">
+              <input type="date" class="form-control rounded-pill" value="{{ current_date.strftime('%Y-%m-%d') }}">
+            </div>
+            <div class="dropdown">
+              <button class="btn btn-primary px-4 rounded-pill" type="button" data-bs-toggle="dropdown">
+                <i class="fas fa-plus me-2"></i>{{ _("جديد") }}
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end shadow">
+                <li><h6 class="dropdown-header">{{ _("إنشاء جديد") }}</h6></li>
+                <li><a class="dropdown-item" href="{{ url_for('ajouter_produit') }}"><i class="fas fa-box me-2"></i>{{ _("منتج") }}</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('clients') }}"><i class="fas fa-user-plus me-2"></i>{{ _("عميل") }}</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('ajouter_vente') }}"><i class="fas fa-cash-register me-2"></i>{{ _("بيع") }}</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Section des indicateurs clés -->
+      <section class="key-metrics mb-4">
+        <div class="row g-4">
+          <!-- Carte Produits -->
+          <div class="col-md-6 col-xl-4">
+            <div class="card metric-card bg-primary text-white">
+              <div class="card-body">
+                <div class="d-flex align-items-center">
+                  <div class="metric-icon">
+                    <i class="fas fa-boxes"></i>
+                  </div>
+                  <div class="ms-3">
+                    <h3 class="mb-0 fw-bold">{{ total_produits }}</h3>
+                    <small>{{ _("المنتجات المسجلة") }}</small>
+                  </div>
+                </div>
+                <div class="metric-progress">
+                  <div class="progress" style="height: 4px;">
+                    <div class="progress-bar bg-white" style="width: 75%"></div>
+                  </div>
+                </div>
+              </div>
+              <a href="{{ url_for('produits') }}" class="stretched-link"></a>
+            </div>
+          </div>
+
+          <!-- Carte Clients -->
+          <div class="col-md-6 col-xl-4">
+            <div class="card metric-card bg-success text-white">
+              <div class="card-body">
+                <div class="d-flex align-items-center">
+                  <div class="metric-icon">
+                    <i class="fas fa-users"></i>
+                  </div>
+                  <div class="ms-3">
+                    <h3 class="mb-0 fw-bold">{{ total_clients }}</h3>
+                    <small>{{ _("العملاء النشطين") }}</small>
+                  </div>
+                </div>
+                <div class="metric-progress">
+                  <div class="progress" style="height: 4px;">
+                    <div class="progress-bar bg-white" style="width: 60%"></div>
+                  </div>
+                </div>
+              </div>
+              <a href="{{ url_for('clients') }}" class="stretched-link"></a>
+            </div>
+          </div>
+
+          <!-- Carte Ventes -->
+          <div class="col-md-6 col-xl-4">
+            <div class="card metric-card bg-info text-white">
+              <div class="card-body">
+                <div class="d-flex align-items-center">
+                  <div class="metric-icon">
+                    <i class="fas fa-coins"></i>
+                  </div>
+                  <div class="ms-3">
+                    <h3 class="mb-0 fw-bold">{{ "%.2f DH"|format(ventes_jour) }}</h3>
+                    <small>{{ _("مبيعات اليوم") }}</small>
+                  </div>
+                </div>
+                <div class="metric-progress">
+                  <div class="progress" style="height: 4px;">
+                    <div class="progress-bar bg-white" style="width: 85%"></div>
+                  </div>
+                </div>
+              </div>
+              <a href="{{ url_for('ventes') }}" class="stretched-link"></a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section principale -->
+      <div class="row g-4">
+        <!-- Graphique des ventes -->
+          <div class="card shadow-lg">
+            <div class="card-header bg-white border-0 py-3">
+              <h5 class="fw-bold mb-0">
+                <i class="fas fa-bolt me-2 text-primary"></i>
+                {{ _("إجراءات سريعة") }}
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="row g-2">
+                <div class="col-6">
+                  <a href="{{ url_for('ajouter_vente') }}" class="btn btn-action btn-primary">
+                    <i class="fas fa-cash-register fa-2x mb-2"></i>
+                    {{ _("بيع جديد") }}
+                  </a>
+                </div>
+                <div class="col-6">
+                  <a href="{{ url_for('ajouter_produit') }}" class="btn btn-action btn-success">
+                    <i class="fas fa-box-circle-check fa-2x mb-2"></i>
+                    {{ _("إضافة منتج") }}
+                  </a>
+                </div>
+                <div class="col-6">
+                  <a href="{{ url_for('ventes') }}" class="btn btn-action btn-info">
+                    <i class="fas fa-file-chart-line fa-2x mb-2"></i>
+                    {{ _("التقارير") }}
+                  </a>
+                </div>
+                <div class="col-6">
+                  <a class="nav-link" href="{{ url_for('parametres_supermarket') }}">
+                      <i class="fas fa-store"></i> Infos Supermarché
+                  </a>
+                   <a class="nav-link" href="{{ url_for('categories') }}">
+                      {{ _("Catégories") }}
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        <!-- Widgets latéraux -->
+        <div class="col-lg-4">
+          <!-- Alertes de stock -->
+          <div class="card shadow-lg mb-4">
+            <div class="card-header bg-white border-0 py-3">
+              <h5 class="fw-bold mb-0">
+                <i class="fas fa-exclamation-triangle me-2 text-warning"></i>
+                {{ _("تنبيهات المخزون") }}
+              </h5>
+            </div>
+            <div class="card-body p-0">
+              {% if low_stock_products %}
+              <div class="list-group list-group-flush">
+                {% for product in low_stock_products %}
+                <div class="list-group-item d-flex align-items-center py-3">
+                  <div class="badge bg-{% if product.quantite <= product.seuil_alerte %}danger{% else %}warning{% endif %} me-3 p-2">
+                    <i class="fas fa-warehouse fa-fw"></i>
+                  </div>
+                  <div class="flex-grow-1">
+                    <h6 class="mb-1">{{ product.nom }}</h6>
+                    <small class="text-muted d-block">
+                      {{ _("المتبقي:") }} {{ product.quantite }} 
+                      <span class="ms-2">{{ _("الحد الأدنى:") }} {{ product.seuil_alerte }}</span>
+                    </small>
+                  </div>
+                  <button class="btn btn-sm btn-icon">
+                    <i class="fas fa-chevron-left"></i>
+                  </button>
+                </div>
+                {% endfor %}
+              </div>
+              {% else %}
+              <div class="text-center p-4">
+                <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                <p class="text-muted mb-0">{{ _("جميع المنتجات ضمن المستويات المطلوبة") }}</p>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Styles améliorés -->
+<style>
+:root {
+  --sidebar-width: 280px;
+  --primary-hover: #0b5ed7;
+}
+
+/* Layout */
+.sidebar-card {
+  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+  border: 1px solid rgba(0,0,0,0.1);
+}
+
+.dashboard-header {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border: 1px solid rgba(0,0,0,0.1);
+}
+
+/* Cartes métriques */
+.metric-card {
+  border: none;
+  overflow: hidden;
+  transition: transform 0.3s ease;
+}
+
+.metric-card:hover {
+  transform: translateY(-5px);
+}
+
+.metric-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.2);
+}
+
+.metric-card .progress {
+  background-color: rgba(255,255,255,0.3);
+}
+
+/* Boutons actions */
+.btn-action {
+  width: 100%;
+  height: 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.btn-action:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+/* Responsive design */
+@media (max-width: 992px) {
+  .sidebar-card {
+    margin: 0 1rem;
+  }
+  
+  .dashboard-header {
+    margin: 0 1rem;
+    width: calc(100% - 2rem);
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.chart-container {
+  animation: fadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+</style>
+
+
+{% endblock %}

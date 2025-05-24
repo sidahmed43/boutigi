@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>{{ _("إدارة العملاء") }}</h1>
+    
+    <a href="#">{{ _("إضافة عميل جديد") }}</a>
+
+    <table>
+        <thead>
+            <tr>
+                <th>{{ _("الاسم") }}</th>
+                <th>{{ _("الهاتف") }}</th>
+                <th>{{ _("الإجراءات") }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td colspan="3">{{ _("لا توجد عملاء مسجلين") }}</td>
+            </tr>
+        </tbody>
+    </table>
+{% endblock %}

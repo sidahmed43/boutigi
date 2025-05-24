@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="form-container">
+    <h1>{{ _("Modifier le produit") }}</h1>
+    
+    {% include '_messages.html' %}
+    
+    <form method="POST">
+        <div class="form-group">
+            <label>{{ _("Nom") }}</label>
+            <input type="text" name="nom" value="{{ produit.nom }}" required class="form-control">
+        </div>
+
+        <div class="form-group">
+            <label>{{ _("Prix") }} (DH)</label>
+            <input type="number" step="0.01" name="prix" 
+                   value="{{ produit.prix }}" required class="form-control">
+        </div>
+
+        <div class="form-group">
+            <label>{{ _("Quantité") }}</label>
+            <input type="number" name="quantite" 
+                   value="{{ produit.quantite }}" required class="form-control">
+        </div>
+
+        <div class="form-group">
+            <label>{{ _("Catégorie") }}</label>
+            <select name="categorie_id" class="form-control">
+                <option value="">{{ _("Aucune catégorie") }}</option>
+                {% for categorie in categories %}
+                    <option value="{{ categorie.id }}" 
+                        {% if produit.categorie_id == categorie.id %}selected{% endif %}>
+                        {{ categorie.nom }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">{{ _("Enregistrer") }}</button>
+        <a href="{{ url_for('produits') }}" class="btn btn-secondary">{{ _("Annuler") }}</a>
+    </form>
+</div>
+{% endblock %}
